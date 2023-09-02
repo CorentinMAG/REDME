@@ -129,10 +129,9 @@ class BottomBar extends StatelessWidget {
                             ),
                             context: context, 
                             builder: (ctx) => _modalBuilder(
-                              ctx, 
-                              "archive",
+                              ctx,
+                              noteProvider.isArchived ? "unarchive" : "archive",
                               () async {
-                                print("archive all");
                                 await noteProvider.archiveAll();
                                 noteProvider.toggleSelectMode();
                                 Navigator.pop(context);
@@ -141,7 +140,7 @@ class BottomBar extends StatelessWidget {
                           );
                         },
                       ),
-                      const Text("Archive")
+                     noteProvider.isArchived ? const Text("Unarchive") : const Text("Archive")
                     ]
                   ),
                 )

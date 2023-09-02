@@ -69,14 +69,27 @@ class NoteProvider extends ChangeNotifier {
 
   Future<void> update(Note note) async {
     await noteService.update(note);
-    final idx = _notes.indexWhere((n) => n.id == note.id);
-    if (idx != -1) {
-      _notes[idx] = note;
-      final filteredIdx = _filteredNotes.indexWhere((n) => n.id == note.id);
-      if (filteredIdx != -1) {
-        _filteredNotes[filteredIdx] = note;
+    if (_isArchiveMode) {
+      final idx = _archivedNotes.indexWhere((n) => n.id == note.id);
+      if (idx != -1) {
+        _filteredNotes[idx] = note;
+        final filteredIdx = _filteredNotes.indexWhere((n) => n.id == note.id);
+        if (filteredIdx != -1) {
+          _filteredNotes[filteredIdx] = note;
+        }
+        notifyListeners();
       }
-      notifyListeners();
+
+    } else {
+      final idx = _notes.indexWhere((n) => n.id == note.id);
+      if (idx != -1) {
+        _notes[idx] = note;
+        final filteredIdx = _filteredNotes.indexWhere((n) => n.id == note.id);
+        if (filteredIdx != -1) {
+          _filteredNotes[filteredIdx] = note;
+        }
+        notifyListeners();
+      }
     }
   }
 
@@ -109,6 +122,15 @@ class NoteProvider extends ChangeNotifier {
     _notes.removeWhere((n) => n.id == note.id);
     _filteredNotes.removeWhere((n) => n.id == note.id);
     _archivedNotes.insert(0, note);
+    notifyListeners();
+  }
+
+  Future<void> unarchive(Note note) async {
+    note.isArchived = false;
+    await noteService.update(note);
+    _archivedNotes.removeWhere((n) => n.id == note.id);
+    _filteredNotes.removeWhere((n) => n.id == note.id);
+    _notes.insert(0, note);
     notifyListeners();
   }
 

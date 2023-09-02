@@ -63,6 +63,10 @@ class _NoteWidgetState extends State<NoteTile> {
                           await noteProvider.update(note);
                           noteProvider.sortByLastUpdated();
                           break;
+                        case "unarchive":
+                        final Note note = result["data"];
+                        await noteProvider.unarchive(note);
+                        break;
 
                       }
                     }

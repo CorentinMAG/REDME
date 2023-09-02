@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:provider/provider.dart';
 import 'package:redme/models/note.dart';
+import 'package:redme/providers/note.dart';
 
 class EditNote extends StatefulWidget {
   final Note? note;
@@ -90,6 +92,7 @@ class _EditNoteState extends State<EditNote> {
 
   @override
   Widget build(BuildContext context) {
+    final noteProvider = Provider.of<NoteProvider>(context);
     return WillPopScope(
       onWillPop: () async {
         if (_titleController.text == "" && _contentController.text == "") {
@@ -112,6 +115,7 @@ class _EditNoteState extends State<EditNote> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
+                      tooltip: "Go back",
                       onPressed: () {
                         if (_titleController.text == "" && _contentController.text == "") {
                           Navigator.pop(context);
@@ -136,9 +140,15 @@ class _EditNoteState extends State<EditNote> {
                     ),
                     Row(
                       children: [
+                        if (widget.note != null)
                         IconButton(
+                          tooltip: noteProvider.isArchived ? "Unarchive note" : "Archive note",
                           onPressed: () async {
-                            Navigator.pop(context, {"action": "archive", "data": widget.note});
+                            if (widget.note != null && widget.note!.isArchived) {
+                              Navigator.pop(context, {"action": "unarchive", "data": widget.note});
+                            } else {
+                              Navigator.pop(context, {"action": "archive", "data": widget.note});
+                            }
                           },
                           padding: const EdgeInsets.all(0),
                           icon: Container(
@@ -154,6 +164,7 @@ class _EditNoteState extends State<EditNote> {
                           )
                         ),
                         IconButton(
+                          tooltip: "Delete note",
                           onPressed: () async {
                             final result = await confirmDialog(context);
                             if (result != null && result) {

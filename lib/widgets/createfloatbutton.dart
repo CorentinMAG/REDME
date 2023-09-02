@@ -9,19 +9,24 @@ class CreateFloatBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final noteProvider = Provider.of<NoteProvider>(context);
-    return FloatingActionButton(
-      onPressed: () async {
-        final result = await Navigator.push(
-          context,
-          MaterialPageRoute(builder: (BuildContext ctx) => EditNote())
-          );
-        if (result != null) {
-          final newNote = Note(title: result["data"][0], content: result["data"][1]);
-          await noteProvider.create(newNote);
-        }
-        },
-      child: const Icon(Icons.add, size: 50),
+    return Consumer<NoteProvider>(
+      builder: (BuildContext context, noteProvider, child) {
+        return FloatingActionButton(
+          tooltip: "Create note",
+          backgroundColor: noteProvider.isArchived ? Colors.amber.shade500 : Theme.of(context).floatingActionButtonTheme.backgroundColor,
+          onPressed: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (BuildContext ctx) => EditNote())
+            );
+            if (result != null) {
+              final newNote = Note(title: result["data"][0], content: result["data"][1]);
+              await noteProvider.create(newNote);
+            }
+          },
+          child: const Icon(Icons.add, size: 50),
+        );
+      }
     );
   }
 }
