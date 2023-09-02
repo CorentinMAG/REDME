@@ -5,6 +5,7 @@ import 'package:redme/screens/note.dart';
 import 'package:redme/screens/task.dart';
 import 'package:redme/widgets/bottombar.dart';
 import 'package:redme/widgets/createfloatbutton.dart';
+import 'package:redme/widgets/indicator.dart';
 
 class HomeScreen extends StatefulWidget {
 
@@ -103,11 +104,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     children: const [
                       Padding(
                         padding: EdgeInsets.only(left: 15.0, right: 15.0),
-                        child: NoteScreen()
+                        child: Indicator(child: NoteScreen())
                       ),
                       Padding(
                         padding: EdgeInsets.only(left: 15.0, right: 15.0),
-                        child: TaskScreen()
+                        child: Indicator(child: TaskScreen())
                       )
                     ]
                   )

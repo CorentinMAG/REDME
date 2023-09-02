@@ -95,7 +95,7 @@ class _EditNoteState extends State<EditNote> {
         if (_titleController.text == "" && _contentController.text == "") {
           Navigator.pop(context);
         } else if (_titleController.text != _originalTitle || _contentController.text != _originalContent) {
-          Navigator.pop(context, [_titleController.text, _contentController.text]);
+          Navigator.pop(context, {"action": "update", "data": [_titleController.text, _contentController.text]});
         } else {
           Navigator.pop(context);
         }
@@ -116,7 +116,7 @@ class _EditNoteState extends State<EditNote> {
                         if (_titleController.text == "" && _contentController.text == "") {
                           Navigator.pop(context);
                         } else if (_titleController.text != _originalTitle || _contentController.text != _originalContent) {
-                          Navigator.pop(context, [_titleController.text, _contentController.text]);
+                          Navigator.pop(context, {"action": "update", "data": [_titleController.text, _contentController.text]});
                         } else {
                           Navigator.pop(context);
                         }
@@ -134,27 +134,48 @@ class _EditNoteState extends State<EditNote> {
                         ),
                       )
                     ),
-                  IconButton(
-                      onPressed: () async {
-                        final result = await confirmDialog(context);
-                        if (result != null && result) {
-                          Navigator.pop(context, widget.note);
-                        }
-                      },
-                      padding: const EdgeInsets.all(0),
-                      icon: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(.8),
-                            borderRadius: BorderRadius.circular(10)),
-                        child: const Icon(
-                          Icons.delete_outline_outlined,
-                          color: Colors.white,
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: () async {
+                            Navigator.pop(context, {"action": "archive", "data": widget.note});
+                          },
+                          padding: const EdgeInsets.all(0),
+                          icon: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                                color: Colors.amber.withOpacity(.8),
+                                borderRadius: BorderRadius.circular(10)),
+                            child: const Icon(
+                              Icons.archive_outlined,
+                              color: Colors.white,
+                            ),
+                          )
                         ),
-                      )
-                    ),
-                ],
+                        IconButton(
+                          onPressed: () async {
+                            final result = await confirmDialog(context);
+                            if (result != null && result) {
+                              Navigator.pop(context, {"action": "delete", "data": widget.note});
+                            }
+                          },
+                          padding: const EdgeInsets.all(0),
+                          icon: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                                color: Colors.red.withOpacity(.8),
+                                borderRadius: BorderRadius.circular(10)),
+                            child: const Icon(
+                              Icons.delete_outline_outlined,
+                              color: Colors.white,
+                            ),
+                          )
+                        )
+                      ]
+                    )
+                ]
               ),
               Expanded(
                   child: ListView(

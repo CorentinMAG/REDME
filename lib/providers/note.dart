@@ -5,11 +5,15 @@ import 'package:redme/services/note.dart';
 class NoteProvider extends ChangeNotifier {
   List<Note> _notes = [];
   List<Note> _filteredNotes = [];
+  List<Note> _archivedNotes = [];
   final NoteService noteService = NoteService();
   bool _isSelectMode = false;
+  bool _isArchiveMode = false;
 
   List<Note> get notes => _filteredNotes;
   bool get isSelectMode => _isSelectMode;
+  bool get isArchived => _isArchiveMode;
+  List<Note> get archived => _archivedNotes;
 
   NoteProvider() {
     _loadNotesFromDB();
@@ -17,7 +21,8 @@ class NoteProvider extends ChangeNotifier {
 
   Future<void> _loadNotesFromDB() async {
     List<Note> notes = await noteService.fetchAll();
-    _notes.addAll(notes);
+    _notes.addAll(notes.where((n) => !n.isArchived).toList());
+    _archivedNotes.addAll(notes.where((n) => n.isArchived).toList());
     sortByLastUpdated();
     _filteredNotes = List.from(_notes);
     notifyListeners();
@@ -49,6 +54,19 @@ class NoteProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> archiveAll() async {
+    final notes = _filteredNotes.where((n) => n.isSelected).toList();
+    for (int i = 0; i < notes.length; i++) {
+      final note = notes[i];
+      note.isArchived = true;
+      await noteService.update(note);
+      _notes.removeWhere((n) => note.id == n.id);
+      _filteredNotes.removeWhere((n) => note.id == n.id);
+      _archivedNotes.insert(0, note);
+    }
+    notifyListeners();
+  }
+
   Future<void> update(Note note) async {
     await noteService.update(note);
     final idx = _notes.indexWhere((n) => n.id == note.id);
@@ -64,18 +82,50 @@ class NoteProvider extends ChangeNotifier {
 
   void filter(String searchText) {
     final searchTextlow = searchText.toLowerCase();
-    _filteredNotes = _notes.where((note) {
-      final title = note.title;
-      final content = note.content;
 
-      return title.contains(searchTextlow) || content.contains(searchTextlow);
+    if (_isArchiveMode) {
+       _filteredNotes = _archivedNotes.where((note) {
+          final title = note.title;
+          final content = note.content;
+
+          return title.contains(searchTextlow) || content.contains(searchTextlow);
+        }).toList();
+
+    } else {
+      _filteredNotes = _notes.where((note) {
+        final title = note.title;
+        final content = note.content;
+
+        return title.contains(searchTextlow) || content.contains(searchTextlow);
     }).toList();
+
+    }
+    notifyListeners();
+  }
+
+  Future<void> archive(Note note) async {
+    note.isArchived = true;
+    await noteService.update(note);
+    _notes.removeWhere((n) => n.id == note.id);
+    _filteredNotes.removeWhere((n) => n.id == note.id);
+    _archivedNotes.insert(0, note);
     notifyListeners();
   }
 
   void toggleSelectMode() {
     _filteredNotes.forEach((n) => n.isSelected = false);
     _isSelectMode = !_isSelectMode;
+    notifyListeners();
+  }
+
+  void toggleArchiveMode() {
+    _isArchiveMode = !_isArchiveMode;
+
+    if (_isArchiveMode) {
+      _filteredNotes = _archivedNotes;
+    } else {
+      _filteredNotes = _notes;
+    }
     notifyListeners();
   }
 

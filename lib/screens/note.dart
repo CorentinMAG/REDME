@@ -15,18 +15,21 @@ class NoteScreen extends StatefulWidget {
 class _NoteScreenState extends State<NoteScreen> {
   @override
   Widget build(BuildContext context) {
-    return Indicator(
-      child: Container(
+    return Container(
         color: Colors.white,
         child: Consumer<NoteProvider>(
           builder: (BuildContext ctx, noteProvider, child) {
             if (noteProvider.notes.isEmpty) {
-              return Center(
-                child: Image.asset("assets/images/note.png", scale: 2,),
+              return ListView(
+                children: [
+                  Container(
+                    child: Image.asset("assets/images/note.png", scale: 2),
+                  )
+                ],
               );
             } else {
               return GridView.count(
-                //physics: const BouncingScrollPhysics(),
+                physics: const AlwaysScrollableScrollPhysics(),
                 crossAxisCount: 2,
                 crossAxisSpacing: 15,
                 children: List.generate(noteProvider.notes.length, (idx) {
@@ -37,7 +40,6 @@ class _NoteScreenState extends State<NoteScreen> {
             }
           }
         ),
-      ),
     );
   }
 }

@@ -44,16 +44,26 @@ class _NoteWidgetState extends State<NoteTile> {
                       MaterialPageRoute(builder: (BuildContext ctx) => EditNote(note: widget.note))
                     );
                     if (result != null) {
-                      if (result is Note) {
-                        await noteProvider.delete(result.id!);
-                      } else {
-                        final updatedNote = widget.note.copyWith(
-                          title: result[0],
-                          content: result[1],
-                          updatedAt: DateTime.now()
-                        );
-                        await noteProvider.update(updatedNote);
-                        noteProvider.sortByLastUpdated();
+                      switch (result["action"]) {
+                        case "delete":
+                          final Note note = result["data"];
+                          await noteProvider.delete(note.id!);
+                          break;
+                        case "archive":
+                          final Note note = result["data"];
+                          await noteProvider.archive(note);
+                          break;
+                        case "update":
+                          final List<String> data = result["data"];
+                          final Note note = widget.note.copyWith(
+                            title: data[0],
+                            content: data[1],
+                            updatedAt: DateTime.now()
+                          );
+                          await noteProvider.update(note);
+                          noteProvider.sortByLastUpdated();
+                          break;
+
                       }
                     }
                   }

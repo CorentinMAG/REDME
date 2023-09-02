@@ -17,7 +17,7 @@ class CreateFloatBtn extends StatelessWidget {
           MaterialPageRoute(builder: (BuildContext ctx) => EditNote())
           );
         if (result != null) {
-          final newNote = Note(title: result[0], content: result[1]);
+          final newNote = Note(title: result["data"][0], content: result["data"][1]);
           await noteProvider.create(newNote);
         }
         },
