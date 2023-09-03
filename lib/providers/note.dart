@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:redme/models/note.dart';
+import 'package:redme/providers/app.dart';
 import 'package:redme/services/note.dart';
 
 class NoteProvider extends ChangeNotifier {
@@ -7,23 +8,20 @@ class NoteProvider extends ChangeNotifier {
   List<Note> _filteredNotes = [];
   List<Note> _archivedNotes = [];
   final NoteService noteService = NoteService();
-  bool _isSelectMode = false;
-  bool _isArchiveMode = false;
+  AppProvider _appProvider;
 
   List<Note> get notes => _filteredNotes;
-  bool get isSelectMode => _isSelectMode;
-  bool get isArchived => _isArchiveMode;
-  List<Note> get archived => _archivedNotes;
+  List<Note> get archivedNotes => _archivedNotes;
 
-  NoteProvider() {
+  NoteProvider(this._appProvider) {
     _loadNotesFromDB();
+    sortByLastUpdated();
   }
 
   Future<void> _loadNotesFromDB() async {
     List<Note> notes = await noteService.fetchAll();
     _notes.addAll(notes.where((n) => !n.isArchived).toList());
     _archivedNotes.addAll(notes.where((n) => n.isArchived).toList());
-    sortByLastUpdated();
     _filteredNotes = List.from(_notes);
     notifyListeners();
   }
@@ -69,7 +67,7 @@ class NoteProvider extends ChangeNotifier {
 
   Future<void> update(Note note) async {
     await noteService.update(note);
-    if (_isArchiveMode) {
+    if (_appProvider.isArchiveMode) {
       final idx = _archivedNotes.indexWhere((n) => n.id == note.id);
       if (idx != -1) {
         _filteredNotes[idx] = note;
@@ -96,7 +94,7 @@ class NoteProvider extends ChangeNotifier {
   void filter(String searchText) {
     final searchTextlow = searchText.toLowerCase();
 
-    if (_isArchiveMode) {
+    if (_appProvider.isArchiveMode) {
        _filteredNotes = _archivedNotes.where((note) {
           final title = note.title;
           final content = note.content;
@@ -134,23 +132,6 @@ class NoteProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleSelectMode() {
-    _filteredNotes.forEach((n) => n.isSelected = false);
-    _isSelectMode = !_isSelectMode;
-    notifyListeners();
-  }
-
-  void toggleArchiveMode() {
-    _isArchiveMode = !_isArchiveMode;
-
-    if (_isArchiveMode) {
-      _filteredNotes = _archivedNotes;
-    } else {
-      _filteredNotes = _notes;
-    }
-    notifyListeners();
-  }
-
   int get selected {
     final notes = _filteredNotes.where((n) => n.isSelected);
     return notes.length;
@@ -167,6 +148,24 @@ class NoteProvider extends ChangeNotifier {
 
   void toggleSelected(Note note) {
     note.isSelected = !note.isSelected;
+    notifyListeners();
+  }
+
+  void updateState(AppProvider appProvider) {
+    _appProvider = appProvider;
+
+    if (!appProvider.isSelectedMode) {
+      _notes.forEach((n) => n.isSelected = false);
+      _archivedNotes.forEach((n) => n.isSelected = false);
+    }
+
+    if (appProvider.isArchiveMode) {
+      _filteredNotes = List.from(_archivedNotes);
+    } else {
+      _filteredNotes = List.from(_notes);
+    }
+    sortByLastUpdated();
+
     notifyListeners();
   }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:redme/models/note.dart';
 import 'package:redme/providers/note.dart';
-import 'package:redme/widgets/indicator.dart';
 import 'package:redme/widgets/notetile.dart';
 
 class NoteScreen extends StatefulWidget {

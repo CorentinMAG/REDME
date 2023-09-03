@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:provider/provider.dart';
 import 'package:redme/models/note.dart';
+import 'package:redme/providers/app.dart';
 import 'package:redme/providers/note.dart';
 import 'package:redme/screens/editnote.dart';
 
@@ -16,9 +17,37 @@ class NoteTile extends StatefulWidget {
 class _NoteWidgetState extends State<NoteTile> {
   bool selectedMode = false;
 
+  Future<void> _doAction(NoteProvider provider, Map data) async {
+    switch (data["action"]) {
+      case "delete":
+        final Note note = data["data"];
+        await provider.delete(note.id!);
+        break;
+      case "archive":
+        final Note note = data["data"];
+        await provider.archive(note);
+        break;
+      case "update":
+        final List<String> d = data["data"];
+        final Note note = widget.note.copyWith(
+          title: d[0],
+          content: d[1],
+          updatedAt: DateTime.now()
+        );
+        await provider.update(note);
+        provider.sortByLastUpdated();
+        break;
+      case "unarchive":
+      final Note note = data["data"];
+      await provider.unarchive(note);
+      break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final noteProvider = Provider.of<NoteProvider>(context);
+    final appProvider = Provider.of<AppProvider>(context);
     return 
         Container(
           width: double.infinity,
@@ -31,11 +60,11 @@ class _NoteWidgetState extends State<NoteTile> {
               child: InkWell(
                 borderRadius: BorderRadius.circular(10.0),
                 onLongPress: () {
-                  noteProvider.toggleSelectMode();
+                  appProvider.toggleSelectedMode();
                   noteProvider.toggleSelected(widget.note);
                 },
                 onTap: () async {
-                  if (noteProvider.isSelectMode) {
+                  if (appProvider.isSelectedMode) {
                     noteProvider.toggleSelected(widget.note);
 
                   } else {
@@ -44,31 +73,7 @@ class _NoteWidgetState extends State<NoteTile> {
                       MaterialPageRoute(builder: (BuildContext ctx) => EditNote(note: widget.note))
                     );
                     if (result != null) {
-                      switch (result["action"]) {
-                        case "delete":
-                          final Note note = result["data"];
-                          await noteProvider.delete(note.id!);
-                          break;
-                        case "archive":
-                          final Note note = result["data"];
-                          await noteProvider.archive(note);
-                          break;
-                        case "update":
-                          final List<String> data = result["data"];
-                          final Note note = widget.note.copyWith(
-                            title: data[0],
-                            content: data[1],
-                            updatedAt: DateTime.now()
-                          );
-                          await noteProvider.update(note);
-                          noteProvider.sortByLastUpdated();
-                          break;
-                        case "unarchive":
-                        final Note note = result["data"];
-                        await noteProvider.unarchive(note);
-                        break;
-
-                      }
+                      await _doAction(noteProvider, result);
                     }
                   }
                 },
@@ -123,7 +128,7 @@ class _NoteWidgetState extends State<NoteTile> {
                       )
                     ),
                     Visibility(
-                      visible: noteProvider.isSelectMode,
+                      visible: appProvider.isSelectedMode,
                       child: Align(
                         alignment: Alignment.bottomRight,
                         child: IconButton(

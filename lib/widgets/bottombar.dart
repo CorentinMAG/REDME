@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:redme/providers/app.dart';
 import 'package:redme/providers/note.dart';
 
 class BottomBar extends StatelessWidget {
@@ -7,6 +8,7 @@ class BottomBar extends StatelessWidget {
 
   Widget _modalBuilder(BuildContext context, String word, Function onPressed) {
     final noteProvider = Provider.of<NoteProvider>(context);
+    final appProvider = Provider.of<AppProvider>(context);
     return Container(
       height: 150.0, // Adjust the height as needed
       child: Column(
@@ -40,7 +42,7 @@ class BottomBar extends StatelessWidget {
                 FilledButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    noteProvider.toggleSelectMode();
+                    appProvider.toggleSelectedMode();
                   }, 
                   style: FilledButton.styleFrom(backgroundColor: Colors.red), 
                   child: const SizedBox(
@@ -63,11 +65,12 @@ class BottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final noteProvider = Provider.of<NoteProvider>(context);
+    final appProvider = Provider.of<AppProvider>(context);
     return AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        height: noteProvider.isSelectMode ? 80 : 0.0,
+        height: appProvider.isSelectedMode ? 80 : 0.0,
         child: Visibility(
-          visible: noteProvider.isSelectMode,
+          visible: appProvider.isSelectedMode,
           child: BottomAppBar(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -92,7 +95,7 @@ class BottomBar extends StatelessWidget {
                               "delete",
                               () async {
                                 await noteProvider.deleteAll();
-                                noteProvider.toggleSelectMode();
+                                appProvider.toggleSelectedMode();
                                 Navigator.pop(context);
                               }
                             ),
@@ -130,17 +133,17 @@ class BottomBar extends StatelessWidget {
                             context: context, 
                             builder: (ctx) => _modalBuilder(
                               ctx,
-                              noteProvider.isArchived ? "unarchive" : "archive",
+                              appProvider.isArchiveMode ? "unarchive" : "archive",
                               () async {
                                 await noteProvider.archiveAll();
-                                noteProvider.toggleSelectMode();
+                                appProvider.toggleSelectedMode();
                                 Navigator.pop(context);
                               }
                             )
                           );
                         },
                       ),
-                     noteProvider.isArchived ? const Text("Unarchive") : const Text("Archive")
+                     appProvider.isArchiveMode ? const Text("Unarchive") : const Text("Archive")
                     ]
                   ),
                 )

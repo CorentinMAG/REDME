@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:redme/providers/note.dart';
 import 'package:redme/screens/note.dart';
 import 'package:redme/screens/task.dart';
 import 'package:redme/widgets/bottombar.dart';
-import 'package:redme/widgets/createfloatbutton.dart';
+import 'package:redme/widgets/floatbutton.dart';
 import 'package:redme/widgets/indicator.dart';
+import 'package:redme/widgets/searchfield.dart';
 
 class HomeScreen extends StatefulWidget {
 
@@ -16,9 +15,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  final TextEditingController textController = TextEditingController();
   late TabController tabController;
-  bool isEditing = false;
 
   @override
   void initState() {
@@ -34,9 +31,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<NoteProvider>(
-      builder: (BuildContext ctx, noteProvider, child) {
-      return Scaffold(
+    return Scaffold(
         body: SafeArea(
           child: Column(
               children: [
@@ -50,53 +45,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(20),
-                  child: TextField(
-                    controller: textController,
-                    onChanged: (String text) {
-                      if (text == "") {
-                        setState(() {
-                          isEditing = false;
-                        });
-                      } else {
-                        setState(() {
-                          isEditing = true;
-                        });
-                      }
-                      noteProvider.filter(text);
-                      noteProvider.sortByLastUpdated();
-                    },
-                    style: const TextStyle(fontSize: 16, color: Colors.black87),
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                      hintText: "Search...",
-                      hintStyle: const TextStyle(color: Colors.grey),
-                      prefixIcon: const Icon(
-                        Icons.search,
-                        color: Colors.grey,
-                      ),
-                      suffixIcon: isEditing ? IconButton(
-                        onPressed: () {
-                          textController.clear();
-                          noteProvider.filter("");
-                          setState(() {
-                            isEditing = false;
-                          });
-                          },
-                        icon: const Icon(Icons.clear_outlined),
-                        color: Colors.grey,
-                        
-                      ) : null,
-                      filled: true,
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: const BorderSide(color: Colors.transparent),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: const BorderSide(color: Colors.transparent),
-                      ),
-                    ),
-                  ),
+                  child: SearchField()
                 ),
                 Expanded(
                   child: TabBarView(
@@ -117,8 +66,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             )
           ),
         bottomNavigationBar: const BottomBar(),
-        floatingActionButton: noteProvider.isSelectMode || isEditing ? null : const CreateFloatBtn()
+        floatingActionButton: const FloatButton()
       );
-    });
   }
 }

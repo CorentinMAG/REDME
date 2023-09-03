@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:provider/provider.dart';
 import 'package:redme/models/note.dart';
-import 'package:redme/providers/note.dart';
+import 'package:redme/providers/app.dart';
 
 class EditNote extends StatefulWidget {
   final Note? note;
@@ -92,7 +92,7 @@ class _EditNoteState extends State<EditNote> {
 
   @override
   Widget build(BuildContext context) {
-    final noteProvider = Provider.of<NoteProvider>(context);
+    final appProvider = Provider.of<AppProvider>(context);
     return WillPopScope(
       onWillPop: () async {
         if (_titleController.text == "" && _contentController.text == "") {
@@ -142,7 +142,7 @@ class _EditNoteState extends State<EditNote> {
                       children: [
                         if (widget.note != null)
                         IconButton(
-                          tooltip: noteProvider.isArchived ? "Unarchive note" : "Archive note",
+                          tooltip: appProvider.isArchiveMode ? "Unarchive note" : "Archive note",
                           onPressed: () async {
                             if (widget.note != null && widget.note!.isArchived) {
                               Navigator.pop(context, {"action": "unarchive", "data": widget.note});

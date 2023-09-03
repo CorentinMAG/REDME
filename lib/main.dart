@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:redme/providers/app.dart';
 import 'package:redme/providers/note.dart';
 import 'package:redme/screens/home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
-    ChangeNotifierProvider(
-      create: (ctx) => NoteProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => AppProvider()
+        ),
+        ChangeNotifierProxyProvider<AppProvider, NoteProvider>(
+          create: (BuildContext context) => NoteProvider(Provider.of<AppProvider>(context, listen: false)),
+          update: (BuildContext context, appProvider, noteProvider) => noteProvider!
+            ..updateState(appProvider)
+        )
+      ],
       child: const MyApp()),
   );
 }

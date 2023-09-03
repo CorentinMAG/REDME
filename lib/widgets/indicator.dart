@@ -2,7 +2,7 @@ import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
-import 'package:redme/providers/note.dart';
+import 'package:redme/providers/app.dart';
 
 class Indicator extends StatefulWidget {
   final Widget child;
@@ -26,16 +26,16 @@ class _IndicatorState extends State<Indicator> with TickerProviderStateMixin{
 
   @override
   Widget build(BuildContext context) {
-    final noteProvider = Provider.of<NoteProvider>(context);
+    final appProvider = Provider.of<AppProvider>(context);
     return CustomRefreshIndicator(
       trigger: IndicatorTrigger.leadingEdge,
-      indicatorFinalizeDuration: const Duration(milliseconds: 10),
-      indicatorSettleDuration: const Duration(milliseconds: 10),
+      indicatorFinalizeDuration: const Duration(milliseconds: 300),
+      indicatorSettleDuration: const Duration(milliseconds: 100),
       indicatorCancelDuration: const Duration(milliseconds: 1000),
       leadingScrollIndicatorVisible: true,
       offsetToArmed: _indicatorSize,
       controller: _controller,
-      onRefresh: () => Future(() => noteProvider.toggleArchiveMode()),
+      onRefresh: () => Future(() => appProvider.toggleArchiveMode()),
       onStateChanged: (change) {
         if (change.didChange(from: IndicatorState.dragging, to: IndicatorState.armed)) {
           setState(() {
@@ -54,8 +54,6 @@ class _IndicatorState extends State<Indicator> with TickerProviderStateMixin{
         Widget child,
         IndicatorController controller,
       ) {
-        final noteProvider = Provider.of<NoteProvider>(context);
-        
           return AnimatedBuilder(
               animation: _controller,
               builder: (context, _) => Stack(
@@ -68,7 +66,7 @@ class _IndicatorState extends State<Indicator> with TickerProviderStateMixin{
                       child: Column(
                         children: [
                           Icon(Icons.lock_open_rounded, size: 68),
-                          Center(child: noteProvider.isArchived ? Text("Release to open normal page", style: TextStyle(fontSize: 20)) : Text("Release to open archive page", style: TextStyle(fontSize: 20)))
+                          Center(child: appProvider.isArchiveMode ? Text("Release to open normal page", style: TextStyle(fontSize: 20)) : Text("Release to open archive page", style: TextStyle(fontSize: 20)))
                         ]
                       ),
                     ),
