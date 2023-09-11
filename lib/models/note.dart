@@ -10,6 +10,10 @@ class Note {
   int color;
   DateTime createdAt;
   DateTime updatedAt;
+  DateTime? reminderTime;
+
+
+  static const _noValueGiven = Object();
 
   Note({
     this.id,
@@ -18,6 +22,7 @@ class Note {
     this.isImportant = false, 
     this.isArchived = false, 
     this.isSelected = false,
+    this.reminderTime,
     createdAt,
     updatedAt,
     int? color
@@ -34,6 +39,7 @@ class Note {
       isArchived: map["isArchived"] == 1,
       isImportant: map["isImportant"] == 1,
       color: map["color"],
+      reminderTime: map["reminderTime"] != null ? DateTime.fromMillisecondsSinceEpoch(map["reminderTime"]).toLocal() : null,
       createdAt: DateTime.fromMillisecondsSinceEpoch(map["createdAt"]).toLocal(),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(map["updatedAt"]).toLocal(),
     );
@@ -47,19 +53,34 @@ class Note {
       "isArchived": isArchived,
       "isImportant": isImportant,
       "color": color,
+      "reminderTime": reminderTime,
       "createdAt": createdAt,
       "updatedAt": updatedAt
     };
   }
 
   // create a copy of the current note with optional new values
-  Note copyWith({int? id, String? title, String? content, bool? isArchived, bool? isImportant, int? color, DateTime? createdAt, DateTime? updatedAt}) {
+  // cannot update reminderTime with this function, use the setter instead
+  Note copyWith(
+    {
+      int? id,
+      String? title, 
+      String? content, 
+      bool? isArchived, 
+      bool? isImportant, 
+      int? color,
+      DateTime? createdAt, 
+      DateTime? updatedAt
+    }
+  ) {
     return Note(
       id: id ?? this.id,
       title: title ?? this.title,
       content: content ?? this.content,
       isArchived: isArchived ?? this.isArchived,
       isImportant: isImportant ?? this.isImportant,
+      color: color ?? this.color,
+      reminderTime: reminderTime,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt
     );
@@ -72,6 +93,7 @@ class Note {
       "isArchived": isArchived ? 1: 0,
       "isImportant": isImportant ? 1: 0,
       "color": color,
+      "reminderTime": reminderTime?.toUtc().millisecondsSinceEpoch,
       "createdAt": createdAt.toUtc().millisecondsSinceEpoch,
       "updatedAt": updatedAt.toUtc().millisecondsSinceEpoch
     };
@@ -79,6 +101,6 @@ class Note {
 
   @override
   String toString() {
-    return 'Note{id: $id, title: $title, content: $content, isArchived: $isArchived, isImportant: $isImportant, isSelected: $isSelected, color: $color}';
+    return 'Note{id: $id, title: $title, content: $content, isArchived: $isArchived, isImportant: $isImportant, isSelected: $isSelected, color: $color, reminderTime: $reminderTime, createAt: $createdAt, updatedAt: $updatedAt}';
   }
 }

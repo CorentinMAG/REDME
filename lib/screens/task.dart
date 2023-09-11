@@ -10,8 +10,15 @@ class TaskScreen extends StatefulWidget {
 class _TaskScreenState extends State<TaskScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text("Task Screen"),
+    return Container(
+        color: Colors.white,
+        child: ListView(
+          children: [
+            Container(
+              child: Image.asset("assets/images/task.png", scale: 2),
+            )
+          ],
+        )
     );
   }
 }

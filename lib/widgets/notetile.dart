@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:redme/models/note.dart';
 import 'package:redme/providers/app.dart';
 import 'package:redme/providers/note.dart';
-import 'package:redme/screens/editnote.dart';
-
+import 'package:redme/screens/edit.dart';
+import 'package:redme/services/notification.dart';
 class NoteTile extends StatefulWidget {
   final Note note;
   const NoteTile({super.key, required this.note});
@@ -26,14 +26,31 @@ class _NoteWidgetState extends State<NoteTile> {
       case "archive":
         final Note note = data["data"];
         await provider.archive(note);
+        if (note.reminderTime != null) {
+          await NotificationService.cancelScheduleNotification(note.id!);
+          note.reminderTime = null;
+          await provider.update(note);
+        }
         break;
       case "update":
-        final List<String> d = data["data"];
+        final List<dynamic> d = data["data"];
         final Note note = widget.note.copyWith(
           title: d[0],
           content: d[1],
-          updatedAt: DateTime.now()
+          updatedAt: DateTime.now(),
+          color: d[3]
         );
+        note.reminderTime = d[2];
+        if (d[2] == null) {
+          await NotificationService.cancelScheduleNotification(note.id!);
+        } else if (d[2] != note.reminderTime){
+          await NotificationService.updateScheduleNotification(
+            note.id!, 
+            "Schedule Notification ${note.id!}", 
+            "Schedule Notification body", 
+            d[2]
+          );
+        }
         await provider.update(note);
         provider.sortByLastUpdated();
         break;
@@ -46,7 +63,7 @@ class _NoteWidgetState extends State<NoteTile> {
 
   @override
   Widget build(BuildContext context) {
-    final noteProvider = Provider.of<NoteProvider>(context);
+    final noteProvider = Provider.of<NoteProvider>(context, listen: false);
     final appProvider = Provider.of<AppProvider>(context);
     return 
         Container(
@@ -59,7 +76,7 @@ class _NoteWidgetState extends State<NoteTile> {
               borderRadius: BorderRadius.circular(10.0)),
               child: InkWell(
                 borderRadius: BorderRadius.circular(10.0),
-                onLongPress: () {
+                onLongPress: () async{
                   appProvider.toggleSelectedMode();
                   noteProvider.toggleSelected(widget.note);
                 },
@@ -115,14 +132,29 @@ class _NoteWidgetState extends State<NoteTile> {
                           ),
                           Padding(
                             padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              Jiffy.parseFromDateTime(widget.note.updatedAt).fromNow(),
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontStyle: FontStyle.italic,
-                                color: Colors.grey.shade800
-                              )
-                            )
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 12.0),
+                                  child: Text(
+                                      Jiffy.parseFromDateTime(widget.note.updatedAt).fromNow(),
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontStyle: FontStyle.italic,
+                                        color: Colors.grey.shade800
+                                      )
+                                    ),
+                                ),
+                                  Visibility(
+                                    visible: widget.note.reminderTime != null && !appProvider.isSelectedMode,
+                                    child: const Icon(
+                                      Icons.timer_outlined, 
+                                      color:Colors.amber
+                                      )
+                                  )
+                              ],
+                            ),
                           ),
                         ],
                       )

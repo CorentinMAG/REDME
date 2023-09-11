@@ -65,6 +65,19 @@ class NoteProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> unarchiveAll() async {
+    final notes = _filteredNotes.where((n) => n.isSelected).toList();
+    for (int i = 0; i < notes.length; i++) {
+      final note = notes[i];
+      note.isArchived = false;
+      await noteService.update(note);
+      _archivedNotes.removeWhere((n) => note.id == n.id);
+      _filteredNotes.removeWhere((n) => note.id == n.id);
+      _notes.insert(0, note);
+    }
+    notifyListeners();
+  }
+
   Future<void> update(Note note) async {
     await noteService.update(note);
     if (_appProvider.isArchiveMode) {
@@ -167,5 +180,17 @@ class NoteProvider extends ChangeNotifier {
     sortByLastUpdated();
 
     notifyListeners();
+  }
+
+  void watch() {
+    _filteredNotes.forEach((n) {
+      if (n.reminderTime != null) {
+        if (n.reminderTime!.isBefore(DateTime.now())) {
+          n.reminderTime = null;
+          update(n);
+          notifyListeners();
+        }
+      }
+    });
   }
 }

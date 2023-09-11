@@ -3,14 +3,14 @@ import 'package:provider/provider.dart';
 import 'package:redme/models/note.dart';
 import 'package:redme/providers/app.dart';
 import 'package:redme/providers/note.dart';
-import 'package:redme/screens/editnote.dart';
+import 'package:redme/screens/edit.dart';
 
 class FloatButton extends StatelessWidget {
   const FloatButton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final noteProvider = Provider.of<NoteProvider>(context);
+    final noteProvider = Provider.of<NoteProvider>(context, listen: false);
     return Consumer<AppProvider>(
       builder: (BuildContext context, appProvider, child) {
         if (appProvider.isEditing) {
@@ -28,7 +28,13 @@ class FloatButton extends StatelessWidget {
                 MaterialPageRoute(builder: (BuildContext ctx) => EditNote())
               );
               if (result != null) {
-                final newNote = Note(title: result["data"][0], content: result["data"][1]);
+                final newNote = Note(
+                  title: result["data"][0], 
+                  content: result["data"][1], 
+                  reminderTime: result["data"][2],
+                  color: result["data"][3]
+                );
+    
                 await noteProvider.create(newNote);
               }
             },

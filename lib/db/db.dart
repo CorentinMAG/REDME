@@ -8,7 +8,7 @@ class DatabaseManager {
       join(path, "redme.db"),
       onCreate: onCreate,
       onUpgrade: onUpgrade,
-      version: 1
+      version: 5
       );
   }
 
@@ -20,6 +20,7 @@ class DatabaseManager {
         "isArchived INTEGER,"
         "isImportant INTEGER,"
         "color INTEGER,"
+        "reminderTime INTEGER,"
         "createdAt INTEGER,"
         "updatedAt INTEGER)"
     );

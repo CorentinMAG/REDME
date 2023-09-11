@@ -5,6 +5,8 @@ class AppProvider extends ChangeNotifier {
   bool _isArchiveMode = false;
   bool _isEditing = false;
 
+  AppProvider() {}
+
   bool get isSelectedMode => _isSelectedMode;
   bool get isArchiveMode => _isArchiveMode;
   bool get isEditing => _isEditing;

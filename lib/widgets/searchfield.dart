@@ -1,19 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:redme/providers/app.dart';
 import 'package:redme/providers/note.dart';
 
-class SearchField extends StatelessWidget {
-  final TextEditingController textController = TextEditingController();
-  SearchField({super.key});
+class SearchField extends StatefulWidget {
+  const SearchField({super.key});
+
+  @override
+  State<SearchField> createState() => _SearchFieldState();
+}
+
+class _SearchFieldState extends State<SearchField> {
+
+  late TextEditingController _textController;
+
+  @override
+  void initState() {
+    _textController = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    final noteProvider = Provider.of<NoteProvider>(context);
+    final noteProvider = Provider.of<NoteProvider>(context, listen: false);
     return Consumer<AppProvider>(
       builder: (BuildContext context, appProvider, child) {
         return TextField(
-          controller: textController,
+          controller: _textController,
           onChanged: (String text) {
             if (text == "") {
               appProvider.isEditing = false;
@@ -34,7 +55,7 @@ class SearchField extends StatelessWidget {
             ),
             suffixIcon: appProvider.isEditing ? IconButton(
               onPressed: () {
-                textController.clear();
+                _textController.clear();
                 noteProvider.filter("");
                 appProvider.isEditing = false;
                 },

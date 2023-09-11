@@ -7,8 +7,8 @@ class BottomBar extends StatelessWidget {
   const BottomBar({super.key});
 
   Widget _modalBuilder(BuildContext context, String word, Function onPressed) {
-    final noteProvider = Provider.of<NoteProvider>(context);
-    final appProvider = Provider.of<AppProvider>(context);
+    final noteProvider = Provider.of<NoteProvider>(context, listen: false);
+    final appProvider = Provider.of<AppProvider>(context, listen: false);
     return Container(
       height: 150.0, // Adjust the height as needed
       child: Column(
@@ -64,93 +64,100 @@ class BottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final noteProvider = Provider.of<NoteProvider>(context);
-    final appProvider = Provider.of<AppProvider>(context);
-    return AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        height: appProvider.isSelectedMode ? 80 : 0.0,
-        child: Visibility(
-          visible: appProvider.isSelectedMode,
-          child: BottomAppBar(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.delete_outlined),
-                        onPressed: () {
-                          showModalBottomSheet(
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20)
+    final noteProvider = Provider.of<NoteProvider>(context, listen: false);
+    return Consumer<AppProvider>(
+      builder: (BuildContext context, appProvider, child) {
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          height: appProvider.isSelectedMode ? 80 : 0.0,
+          child: Visibility(
+            visible: appProvider.isSelectedMode,
+            child: BottomAppBar(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.delete_outlined),
+                          onPressed: () {
+                            showModalBottomSheet(
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(20),
+                                  topRight: Radius.circular(20)
+                                ),
                               ),
-                            ),
-                            context: context, 
-                            builder: (ctx) => _modalBuilder(
-                              ctx, 
-                              "delete",
-                              () async {
-                                await noteProvider.deleteAll();
-                                appProvider.toggleSelectedMode();
-                                Navigator.pop(context);
-                              }
-                            ),
-                          );
-                        },
-                      ),
-                      const Text("Delete")
-                    ]
-                  ),
-                ),
-                SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.label_important_outline),
-                        onPressed: () {},
-                      ),
-                      const Text("Important")
-                    ]
-                  ),
-                ),
-                SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.archive_outlined),
-                        onPressed: () {
-                          showModalBottomSheet(
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20)
+                              context: context, 
+                              builder: (ctx) => _modalBuilder(
+                                ctx, 
+                                "delete",
+                                () async {
+                                  await noteProvider.deleteAll();
+                                  appProvider.toggleSelectedMode();
+                                  Navigator.pop(context);
+                                }
                               ),
-                            ),
-                            context: context, 
-                            builder: (ctx) => _modalBuilder(
-                              ctx,
-                              appProvider.isArchiveMode ? "unarchive" : "archive",
-                              () async {
-                                await noteProvider.archiveAll();
-                                appProvider.toggleSelectedMode();
-                                Navigator.pop(context);
-                              }
-                            )
-                          );
-                        },
-                      ),
-                     appProvider.isArchiveMode ? const Text("Unarchive") : const Text("Archive")
-                    ]
+                            );
+                          },
+                        ),
+                        const Text("Delete")
+                      ]
+                    ),
                   ),
-                )
-              ],
+                  SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.label_important_outline),
+                          onPressed: () {},
+                        ),
+                        const Text("Important")
+                      ]
+                    ),
+                  ),
+                  SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.archive_outlined),
+                          onPressed: () {
+                            showModalBottomSheet(
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(20),
+                                  topRight: Radius.circular(20)
+                                ),
+                              ),
+                              context: context, 
+                              builder: (ctx) => _modalBuilder(
+                                ctx,
+                                appProvider.isArchiveMode ? "unarchive" : "archive",
+                                () async {
+                                  if (appProvider.isArchiveMode) {
+                                    await noteProvider.unarchiveAll();
+                                  } else {
+                                    await noteProvider.archiveAll();
+                                  }
+                                  appProvider.toggleSelectedMode();
+                                  Navigator.pop(context);
+                                }
+                              )
+                            );
+                          },
+                        ),
+                       appProvider.isArchiveMode ? const Text("Unarchive") : const Text("Archive")
+                      ]
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
-        ),
-      );
+        );
+      }
+    );
   }
 }
