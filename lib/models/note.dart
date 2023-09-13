@@ -12,9 +12,6 @@ class Note {
   DateTime updatedAt;
   DateTime? reminderTime;
 
-
-  static const _noValueGiven = Object();
-
   Note({
     this.id,
     required this.title, 

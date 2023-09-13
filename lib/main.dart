@@ -11,7 +11,6 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService.initialize();
-  await NotificationService.requestPermission();
   tz.initializeTimeZones();
   final String currentTimeZone = await FlutterTimezone.getLocalTimezone();
   tz.setLocalLocation(tz.getLocation(currentTimeZone));

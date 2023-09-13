@@ -40,7 +40,6 @@ class _NoteWidgetState extends State<NoteTile> {
           updatedAt: DateTime.now(),
           color: d[3]
         );
-        note.reminderTime = d[2];
         if (d[2] == null) {
           await NotificationService.cancelScheduleNotification(note.id!);
         } else if (d[2] != note.reminderTime){
@@ -51,6 +50,7 @@ class _NoteWidgetState extends State<NoteTile> {
             d[2]
           );
         }
+        note.reminderTime = d[2];
         await provider.update(note);
         provider.sortByLastUpdated();
         break;
@@ -65,115 +65,114 @@ class _NoteWidgetState extends State<NoteTile> {
   Widget build(BuildContext context) {
     final noteProvider = Provider.of<NoteProvider>(context, listen: false);
     final appProvider = Provider.of<AppProvider>(context);
-    return 
-        Container(
-          width: double.infinity,
-          child: Card(
-            color: Color(widget.note.color),
-            margin: const EdgeInsets.only(bottom: 20),
-            elevation: 3,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0)),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(10.0),
-                onLongPress: () async{
-                  appProvider.toggleSelectedMode();
-                  noteProvider.toggleSelected(widget.note);
-                },
-                onTap: () async {
-                  if (appProvider.isSelectedMode) {
-                    noteProvider.toggleSelected(widget.note);
+    return Container(
+      width: double.infinity,
+      child: Card(
+        color: Color(widget.note.color),
+        margin: const EdgeInsets.only(bottom: 20),
+        elevation: 3,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0)),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(10.0),
+            onLongPress: () async{
+              appProvider.toggleSelectedMode();
+              noteProvider.toggleSelected(widget.note);
+            },
+            onTap: () async {
+              if (appProvider.isSelectedMode) {
+                noteProvider.toggleSelected(widget.note);
 
-                  } else {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (BuildContext ctx) => EditNote(note: widget.note))
-                    );
-                    if (result != null) {
-                      await _doAction(noteProvider, result);
-                    }
-                  }
-                },
-                child: Stack(
-                  children: [
-                      Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          RichText(
-                            maxLines: 1, 
-                            overflow: TextOverflow.ellipsis, 
-                            text: TextSpan(
-                              text: widget.note.title,
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                                height: 1.5
-                              )
-                            ),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: RichText(
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                              text: TextSpan(
-                                text: widget.note.content,
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 14,
-                                  height: 1.5
-                                ),
-                              )
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 12.0),
-                                  child: Text(
-                                      Jiffy.parseFromDateTime(widget.note.updatedAt).fromNow(),
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontStyle: FontStyle.italic,
-                                        color: Colors.grey.shade800
-                                      )
-                                    ),
-                                ),
-                                  Visibility(
-                                    visible: widget.note.reminderTime != null && !appProvider.isSelectedMode,
-                                    child: const Icon(
-                                      Icons.timer_outlined, 
-                                      color:Colors.amber
-                                      )
-                                  )
-                              ],
-                            ),
-                          ),
-                        ],
-                      )
-                    ),
-                    Visibility(
-                      visible: appProvider.isSelectedMode,
-                      child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: IconButton(
-                          color: Colors.grey,
-                          onPressed: () => {}, 
-                          icon: widget.note.isSelected ? const Icon(Icons.check_circle) : const Icon(Icons.circle)
+              } else {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (BuildContext ctx) => EditNote(note: widget.note))
+                );
+                if (result != null) {
+                  await _doAction(noteProvider, result);
+                }
+              }
+            },
+            child: Stack(
+              children: [
+                  Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      RichText(
+                        maxLines: 1, 
+                        overflow: TextOverflow.ellipsis, 
+                        text: TextSpan(
+                          text: widget.note.title,
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            height: 1.5
+                          )
                         ),
-                      )
-                    )
-                  ],
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: RichText(
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          text: TextSpan(
+                            text: widget.note.content,
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.normal,
+                              fontSize: 14,
+                              height: 1.5
+                            ),
+                          )
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12.0),
+                              child: Text(
+                                  Jiffy.parseFromDateTime(widget.note.updatedAt).fromNow(),
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontStyle: FontStyle.italic,
+                                    color: Colors.grey.shade800
+                                  )
+                                ),
+                            ),
+                              Visibility(
+                                visible: widget.note.reminderTime != null && !appProvider.isSelectedMode,
+                                child: const Icon(
+                                  Icons.timer_outlined, 
+                                  color:Colors.amber
+                                  )
+                              )
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                ),
+                Visibility(
+                  visible: appProvider.isSelectedMode,
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: IconButton(
+                      color: Colors.grey,
+                      onPressed: () => {}, 
+                      icon: widget.note.isSelected ? const Icon(Icons.check_circle) : const Icon(Icons.circle)
+                    ),
+                  )
                 )
-              )
-          ),
-        );
+              ],
+            )
+          )
+      ),
+    );
   }
 }

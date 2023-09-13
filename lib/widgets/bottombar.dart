@@ -111,17 +111,6 @@ class BottomBar extends StatelessWidget {
                     child: Column(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.label_important_outline),
-                          onPressed: () {},
-                        ),
-                        const Text("Important")
-                      ]
-                    ),
-                  ),
-                  SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        IconButton(
                           icon: const Icon(Icons.archive_outlined),
                           onPressed: () {
                             showModalBottomSheet(

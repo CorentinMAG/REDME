@@ -14,8 +14,7 @@ class NoteProvider extends ChangeNotifier {
   List<Note> get archivedNotes => _archivedNotes;
 
   NoteProvider(this._appProvider) {
-    _loadNotesFromDB();
-    sortByLastUpdated();
+    _loadNotesFromDB().then((_) => sortByLastUpdated());
   }
 
   Future<void> _loadNotesFromDB() async {
@@ -26,12 +25,13 @@ class NoteProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> create(Note note) async {
+  Future<int> create(Note note) async {
     final id = await noteService.create(note);
     final newNote = note.copyWith(id: id);
     _notes.insert(0, newNote);
     _filteredNotes.insert(0, newNote);
     notifyListeners();
+    return id;
   }
 
   Future<void> delete(int id) async {

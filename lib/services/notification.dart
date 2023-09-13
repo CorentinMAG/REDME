@@ -25,18 +25,20 @@ class NotificationService {
   }
 
   static Future<void> onReceiveNotificationResponse(NotificationResponse response) async {
-    print(response);
+    print("on receive notification: $response");
   }
 
   static Future<void> onReceiveBackgroundNotificationResponse(NotificationResponse response) async {
-    print(response);
+    print("on receive background notification: $response");
   }
 
-  static Future<void> requestPermission() async {
-    bool isAllowed = await _flnp.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()!.requestPermission() as bool;
+  static Future<bool> _requestPermission() async {
+    return await _flnp.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()!.requestPermission() as bool;
   }
 
   static Future<void> showLocalNotification(String title, String body) async {
+    final bool isAllowed = await _requestPermission();
+    if (!isAllowed) return;
     const androidNotificationDetail = AndroidNotificationDetails(
     '0',
     'general',
@@ -52,11 +54,12 @@ class NotificationService {
   }
 
   static Future<void> scheduleLocalNotification(int id, String title, String body, DateTime datetime) async {
-
+    final isAllowed = await _requestPermission();
+    if (!isAllowed) return; 
     const androidNotificationDetail = AndroidNotificationDetails(
       '0',
       'general',
-      sound: UriAndroidNotificationSound('asset://assets/sound.wav'),
+      sound: RawResourceAndroidNotificationSound('sound'),
       playSound: true,
     );
 

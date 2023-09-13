@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:redme/providers/note.dart';
@@ -34,42 +32,42 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return WatcherLoop(
       provider: noteProvider,
       child: Scaffold(
-          body: SafeArea(
-            child: Column(
-                children: [
-                  TabBar(
+        body: SafeArea(
+          child: Column(
+              children: [
+                TabBar(
+                  controller: tabController,
+                  labelColor: Colors.black,
+                  tabs: const [
+                    Tab(text: 'Notes', icon: Icon(Icons.article)),
+                    Tab(text: 'Tasks', icon: Icon(Icons.fact_check_outlined)),
+                  ],
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(20),
+                  child: SearchField()
+                ),
+                Expanded(
+                  child: TabBarView(
                     controller: tabController,
-                    labelColor: Colors.black,
-                    tabs: const [
-                      Tab(text: 'Notes', icon: Icon(Icons.article)),
-                      Tab(text: 'Tasks', icon: Icon(Icons.fact_check_outlined)),
-                    ],
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.all(20),
-                    child: SearchField()
-                  ),
-                  Expanded(
-                    child: TabBarView(
-                      controller: tabController,
-                      children: const [
-                        Padding(
-                          padding: EdgeInsets.only(left: 15.0, right: 15.0),
-                          child: Indicator(child: NoteScreen())
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 15.0, right: 15.0),
-                          child: Indicator(child: TaskScreen())
-                        )
-                      ]
-                    )
-                  ),
-                ]
-              )
-            ),
-          bottomNavigationBar: const BottomBar(),
-          floatingActionButton: const FloatButton()
-        ),
+                    children: const [
+                      Padding(
+                        padding: EdgeInsets.only(left: 15.0, right: 15.0),
+                        child: Indicator(child: NoteScreen())
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 15.0, right: 15.0),
+                        child: Indicator(child: TaskScreen())
+                      )
+                    ]
+                  )
+                ),
+              ]
+            )
+          ),
+        bottomNavigationBar: const BottomBar(),
+        floatingActionButton: const FloatButton()
+      )
     );
   }
 }

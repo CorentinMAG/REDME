@@ -4,6 +4,7 @@ import 'package:redme/models/note.dart';
 import 'package:redme/providers/app.dart';
 import 'package:redme/providers/note.dart';
 import 'package:redme/screens/edit.dart';
+import 'package:redme/services/notification.dart';
 
 class FloatButton extends StatelessWidget {
   const FloatButton({super.key});
@@ -35,7 +36,12 @@ class FloatButton extends StatelessWidget {
                   color: result["data"][3]
                 );
     
-                await noteProvider.create(newNote);
+                final id = await noteProvider.create(newNote);
+                if (newNote.reminderTime != null) {
+                  NotificationService.scheduleLocalNotification(
+                    id, newNote.title, newNote.content, newNote.reminderTime!
+                  );
+                }
               }
             },
             child: const Icon(Icons.add, size: 50),

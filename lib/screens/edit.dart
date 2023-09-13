@@ -214,8 +214,8 @@ class _EditNoteState extends State<EditNote> {
                             overflow: TextOverflow.ellipsis, 
                             text: TextSpan(
                               text: widget.note != null ? 
-                              Jiffy.parseFromDateTime(widget.note!.updatedAt).yMMMMEEEEdjm : 
-                              Jiffy.parseFromDateTime(DateTime.now()).yMMMMEEEEdjm,
+                              Jiffy.parseFromDateTime(widget.note!.updatedAt).yMMMEdjm : 
+                              Jiffy.parseFromDateTime(DateTime.now()).yMMMEdjm,
                               style: const TextStyle(
                                 color: Colors.black87,
                                 fontSize: 12,
@@ -223,6 +223,7 @@ class _EditNoteState extends State<EditNote> {
                               )
                             ),
                           ),
+                          const Padding(padding: EdgeInsets.only(left: 5, right: 5, bottom: 3), child: Text("I"),),
                           Visibility(
                             visible: widget.note != null ? !widget.note!.isArchived : true,
                             child: GestureDetector(
@@ -231,20 +232,38 @@ class _EditNoteState extends State<EditNote> {
                                   _reminderTime = null;
                                 });
                               },
-                              child: IconButton(
-                                onPressed: () {
-                                  picker.DatePicker.showDateTimePicker(context,
-                                    showTitleActions: true, 
-                                    minTime: DateTime.now().add(const Duration(minutes: 5)),
-                                    onConfirm: (date) {
-                                      setState(() {
-                                        _reminderTime = date;
-                                      });
-                                    },
-                                    currentTime: DateTime.now().add(const Duration(minutes: 20)),
-                                    locale: picker.LocaleType.en);
-                                },
-                                icon: Icon(Icons.timer_outlined, color: _reminderTime != null ? Colors.amber : Colors.black)
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 3.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    IconButton(
+                                      padding: const EdgeInsets.all(0.0),
+                                      constraints: const BoxConstraints(),
+                                      onPressed: () {
+                                        picker.DatePicker.showDateTimePicker(context,
+                                          showTitleActions: true, 
+                                          minTime: DateTime.now().add(const Duration(minutes: 2)),
+                                          onConfirm: (date) {
+                                            setState(() {
+                                              _reminderTime = date;
+                                            });
+                                          },
+                                          currentTime: widget.note != null ? widget.note!.reminderTime ?? DateTime.now().add(const Duration(minutes: 20)) : DateTime.now().add(const Duration(minutes: 20)),
+                                          locale: picker.LocaleType.en);
+                                      },
+                                      icon: Icon(Icons.timer_outlined, color: _reminderTime != null ? Colors.amber : Colors.black, size: 18)
+                                    ),
+                                    if (_reminderTime != null)
+                                    Text(
+                                      Jiffy.parseFromDateTime(_reminderTime!).fromNow(), 
+                                      style: const TextStyle(
+                                        fontSize: 12.0,
+                                        color: Colors.amber
+                                      )
+                                    ),
+                                  ]
+                                ),
                               ),
                             ),
                           )
