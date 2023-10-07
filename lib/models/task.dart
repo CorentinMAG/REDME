@@ -1,39 +1,43 @@
 import 'package:flutter/material.dart';
 
-class Note {
+class Task {
   int? id;
-  String title;
   String content;
+  bool isCompleted;
   bool isArchived;
   bool isSelected;
   int color;
+  int? parentId;
   DateTime createdAt;
   DateTime updatedAt;
-  DateTime? reminderTime;
+  List<Task> subtasks;
 
-  Note({
+
+  Task({
     this.id,
-    required this.title, 
-    required this.content, 
-    this.isArchived = false, 
+    required this.content,
+    this.isCompleted = false,
+    this.isArchived = false,
     this.isSelected = false,
-    this.reminderTime,
+    subtasks,
+    this.parentId,
+    int? color,
     DateTime? createdAt,
-    DateTime? updatedAt,
-    int? color
-    }): 
-    color = color ?? Colors.white.value,
-    createdAt = createdAt ?? DateTime.now(),
-    updatedAt = updatedAt ?? DateTime.now();
+    DateTime? updatedAt
+  }):
+  color = color ?? Colors.white.value,
+  subtasks = subtasks ?? [],
+  createdAt = createdAt ?? DateTime.now(),
+  updatedAt = updatedAt ?? DateTime.now();
 
-  factory Note.fromDatabase3(Map<String, dynamic> map) {
-    return Note(
+  factory Task.fromDatabase3(Map<String, dynamic> map) {
+    return Task(
       id: map["id"],
-      title: map["title"],
       content: map["content"],
+      isCompleted: map["isCompleted"] == 1,
       isArchived: map["isArchived"] == 1,
       color: map["color"],
-      reminderTime: map["reminderTime"] != null ? DateTime.fromMillisecondsSinceEpoch(map["reminderTime"]).toLocal() : null,
+      parentId: map["parentId"],
       createdAt: DateTime.fromMillisecondsSinceEpoch(map["createdAt"]).toLocal(),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(map["updatedAt"]).toLocal(),
     );
@@ -42,36 +46,38 @@ class Note {
   Map<String, dynamic> toMap() {
     return {
       "id": id,
-      "title": title,
       "content": content,
+      "isCompleted": isCompleted,
       "isArchived": isArchived,
       "color": color,
-      "reminderTime": reminderTime,
+      "parentId": parentId,
+      "subtasks": subtasks,
       "createdAt": createdAt,
       "updatedAt": updatedAt
     };
   }
 
-  // create a copy of the current note with optional new values
-  // cannot update reminderTime with this function, use the setter instead
-  Note copyWith(
+  Task copyWith(
     {
       int? id,
-      String? title, 
       String? content, 
-      bool? isArchived, 
+      bool? isCompleted,
+      bool? isArchived,
       int? color,
+      int? parentId,
+      List<Task>? subtasks,
       DateTime? createdAt, 
       DateTime? updatedAt
     }
   ) {
-    return Note(
+    return Task(
       id: id ?? this.id,
-      title: title ?? this.title,
       content: content ?? this.content,
+      isCompleted: isCompleted ?? this.isCompleted,
       isArchived: isArchived ?? this.isArchived,
       color: color ?? this.color,
-      reminderTime: reminderTime,
+      parentId: parentId ?? this.parentId,
+      subtasks: subtasks ?? this.subtasks,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt
     );
@@ -79,11 +85,11 @@ class Note {
 
   Map<String, dynamic> toMap3() {
     return {
-      "title": title,
       "content": content,
+      "isCompleted": isCompleted ? 1: 0,
       "isArchived": isArchived ? 1: 0,
       "color": color,
-      "reminderTime": reminderTime?.toUtc().millisecondsSinceEpoch,
+      "parentId": parentId,
       "createdAt": createdAt.toUtc().millisecondsSinceEpoch,
       "updatedAt": updatedAt.toUtc().millisecondsSinceEpoch
     };
@@ -91,6 +97,6 @@ class Note {
 
   @override
   String toString() {
-    return 'Note{id: $id, title: $title, content: $content, isArchived: $isArchived, isSelected: $isSelected, color: $color, reminderTime: $reminderTime, createdAt: $createdAt, updatedAt: $updatedAt}';
+    return 'Note{id: $id, content: $content, isCompleted: $isCompleted, isArchived: $isArchived, isSelected: $isSelected, color: $color, parentId: $parentId, createdAt: $createdAt, updatedAt: $updatedAt}';
   }
 }

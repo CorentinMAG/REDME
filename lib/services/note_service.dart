@@ -1,5 +1,5 @@
 import 'package:redme/models/note.dart';
-import 'package:redme/repositories/note.dart';
+import 'package:redme/repositories/note_repository.dart';
 
 class NoteService {
   final noteRepository = NoteRepository();

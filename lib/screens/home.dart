@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:redme/providers/note.dart';
+import 'package:redme/providers/note_provider.dart';
 import 'package:redme/screens/note.dart';
 import 'package:redme/screens/task.dart';
-import 'package:redme/widgets/bottombar.dart';
-import 'package:redme/widgets/floatbutton.dart';
+import 'package:redme/widgets/bottom_bar.dart';
+import 'package:redme/widgets/float_button.dart';
 import 'package:redme/widgets/indicator.dart';
-import 'package:redme/widgets/searchfield.dart';
+import 'package:redme/widgets/search_field.dart';
 import 'package:redme/widgets/watcher.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,12 +18,26 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  late TabController tabController;
+  late TabController _tabController;
+  int tabIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(_handleTabChange);
+  }
+
+  void _handleTabChange() {
+    setState(() {
+      tabIndex = _tabController.index;
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -31,16 +45,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final noteProvider = Provider.of<NoteProvider>(context, listen: false);
     return WatcherLoop(
       provider: noteProvider,
+      duration: const Duration(seconds: 5),
       child: Scaffold(
         body: SafeArea(
           child: Column(
               children: [
                 TabBar(
-                  controller: tabController,
+                  controller: _tabController,
                   labelColor: Colors.black,
                   tabs: const [
                     Tab(text: 'Notes', icon: Icon(Icons.article)),
                     Tab(text: 'Tasks', icon: Icon(Icons.fact_check_outlined)),
+                    Tab(text: "Settings", icon: Icon(Icons.settings))
                   ],
                 ),
                 const Padding(
@@ -49,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
                 Expanded(
                   child: TabBarView(
-                    controller: tabController,
+                    controller: _tabController,
                     children: const [
                       Padding(
                         padding: EdgeInsets.only(left: 15.0, right: 15.0),
@@ -58,15 +74,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       Padding(
                         padding: EdgeInsets.only(left: 15.0, right: 15.0),
                         child: Indicator(child: TaskScreen())
-                      )
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 15.0, right: 15.0),
+                        child: Indicator(child: Text("Settings"))
+                      ),
                     ]
                   )
                 ),
               ]
             )
           ),
-        bottomNavigationBar: const BottomBar(),
-        floatingActionButton: const FloatButton()
+        bottomNavigationBar: BottomBar(index: tabIndex),
+        floatingActionButton: FloatButton(index: tabIndex)
       )
     );
   }

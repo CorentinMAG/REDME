@@ -2,7 +2,7 @@ import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
-import 'package:redme/providers/app.dart';
+import 'package:redme/providers/app_provider.dart';
 
 class Indicator extends StatefulWidget {
   final Widget child;

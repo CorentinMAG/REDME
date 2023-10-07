@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:redme/models/note.dart';
-import 'package:redme/providers/app.dart';
-import 'package:redme/services/note.dart';
+import 'package:redme/providers/app_provider.dart';
+import 'package:redme/services/note_service.dart';
 
 class NoteProvider extends ChangeNotifier {
   List<Note> _notes = [];
   List<Note> _filteredNotes = [];
   List<Note> _archivedNotes = [];
-  final NoteService noteService = NoteService();
+  final _noteService = NoteService();
   AppProvider _appProvider;
 
   List<Note> get notes => _filteredNotes;
@@ -18,7 +18,7 @@ class NoteProvider extends ChangeNotifier {
   }
 
   Future<void> _loadNotesFromDB() async {
-    List<Note> notes = await noteService.fetchAll();
+    List<Note> notes = await _noteService.fetchAll();
     _notes.addAll(notes.where((n) => !n.isArchived).toList());
     _archivedNotes.addAll(notes.where((n) => n.isArchived).toList());
     _filteredNotes = List.from(_notes);
@@ -26,7 +26,7 @@ class NoteProvider extends ChangeNotifier {
   }
 
   Future<int> create(Note note) async {
-    final id = await noteService.create(note);
+    final id = await _noteService.create(note);
     final newNote = note.copyWith(id: id);
     _notes.insert(0, newNote);
     _filteredNotes.insert(0, newNote);
@@ -35,7 +35,7 @@ class NoteProvider extends ChangeNotifier {
   }
 
   Future<void> delete(int id) async {
-    await noteService.delete(id);
+    await _noteService.delete(id);
     _notes.removeWhere((note) => note.id == id);
     _filteredNotes.removeWhere((note) => note.id == id);
     notifyListeners();
@@ -45,7 +45,7 @@ class NoteProvider extends ChangeNotifier {
     final notes = _filteredNotes.where((n) => n.isSelected).toList();
     for (int i = 0; i < notes.length; i++) {
       final note = notes[i];
-      await noteService.delete(note.id!);
+      await _noteService.delete(note.id!);
       _notes.removeWhere((n) => note.id == n.id);
       _filteredNotes.removeWhere((n) => note.id == n.id);
     }
@@ -57,7 +57,7 @@ class NoteProvider extends ChangeNotifier {
     for (int i = 0; i < notes.length; i++) {
       final note = notes[i];
       note.isArchived = true;
-      await noteService.update(note);
+      await _noteService.update(note);
       _notes.removeWhere((n) => note.id == n.id);
       _filteredNotes.removeWhere((n) => note.id == n.id);
       _archivedNotes.insert(0, note);
@@ -70,7 +70,7 @@ class NoteProvider extends ChangeNotifier {
     for (int i = 0; i < notes.length; i++) {
       final note = notes[i];
       note.isArchived = false;
-      await noteService.update(note);
+      await _noteService.update(note);
       _archivedNotes.removeWhere((n) => note.id == n.id);
       _filteredNotes.removeWhere((n) => note.id == n.id);
       _notes.insert(0, note);
@@ -79,7 +79,7 @@ class NoteProvider extends ChangeNotifier {
   }
 
   Future<void> update(Note note) async {
-    await noteService.update(note);
+    await _noteService.update(note);
     if (_appProvider.isArchiveMode) {
       final idx = _archivedNotes.indexWhere((n) => n.id == note.id);
       if (idx != -1) {
@@ -129,7 +129,7 @@ class NoteProvider extends ChangeNotifier {
 
   Future<void> archive(Note note) async {
     note.isArchived = true;
-    await noteService.update(note);
+    await _noteService.update(note);
     _notes.removeWhere((n) => n.id == note.id);
     _filteredNotes.removeWhere((n) => n.id == note.id);
     _archivedNotes.insert(0, note);
@@ -138,7 +138,7 @@ class NoteProvider extends ChangeNotifier {
 
   Future<void> unarchive(Note note) async {
     note.isArchived = false;
-    await noteService.update(note);
+    await _noteService.update(note);
     _archivedNotes.removeWhere((n) => n.id == note.id);
     _filteredNotes.removeWhere((n) => n.id == note.id);
     _notes.insert(0, note);

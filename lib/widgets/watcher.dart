@@ -1,12 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:redme/providers/note.dart';
+import 'package:redme/providers/note_provider.dart';
 
 class WatcherLoop extends StatefulWidget {
   Widget child;
   NoteProvider provider;
-  WatcherLoop({super.key, required this.provider, required this.child});
+  Duration duration;
+  WatcherLoop({super.key, required this.provider, required this.duration, required this.child});
 
   @override
   State<WatcherLoop> createState() => _WatcherLoopState();
@@ -31,7 +32,7 @@ class _WatcherLoopState extends State<WatcherLoop> {
   // every 5 seconds we loop through the list of notes and 
   // if the reminder time is over, we set reminder time to null
   void _startWatcherLoop() {
-    _timer = Timer.periodic(const Duration(seconds: 5), (Timer timer) {
+    _timer = Timer.periodic(widget.duration, (Timer timer) {
       widget.provider.watch();
     });
   }

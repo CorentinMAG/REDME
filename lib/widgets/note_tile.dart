@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:provider/provider.dart';
 import 'package:redme/models/note.dart';
-import 'package:redme/providers/app.dart';
-import 'package:redme/providers/note.dart';
+import 'package:redme/providers/app_provider.dart';
+import 'package:redme/providers/note_provider.dart';
 import 'package:redme/screens/edit.dart';
-import 'package:redme/services/notification.dart';
+import 'package:redme/services/notification_service.dart';
 class NoteTile extends StatefulWidget {
   final Note note;
   const NoteTile({super.key, required this.note});
@@ -45,8 +45,8 @@ class _NoteWidgetState extends State<NoteTile> {
         } else if (d[2] != note.reminderTime){
           await NotificationService.updateScheduleNotification(
             note.id!, 
-            "Schedule Notification ${note.id!}", 
-            "Schedule Notification body", 
+            note.title, 
+            note.content, 
             d[2]
           );
         }

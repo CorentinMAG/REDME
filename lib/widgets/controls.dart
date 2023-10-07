@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:redme/models/note.dart';
-import 'package:redme/providers/app.dart';
+import 'package:redme/providers/app_provider.dart';
 
 class ControlBar extends StatelessWidget {
   Function onWillPop;
