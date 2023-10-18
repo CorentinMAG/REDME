@@ -3,7 +3,8 @@ import 'package:redme/models/task.dart';
 
 class SubTaskTile extends StatefulWidget {
   Task task;
-  SubTaskTile({super.key, required this.task});
+  FocusNode focusNode;
+  SubTaskTile({super.key, required this.task, required this.focusNode});
 
   @override
   State<SubTaskTile> createState() => _SubTaskTileState();
@@ -48,6 +49,7 @@ class _SubTaskTileState extends State<SubTaskTile> {
           onChanged: onChanged,
         ),
         title: TextField(
+          focusNode: widget.focusNode,
           readOnly: false,
           controller: _textController,
           onChanged: onContentChanged,

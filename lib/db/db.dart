@@ -9,7 +9,7 @@ class DatabaseManager {
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
       onConfigure: _onConfigure,
-      version: 5
+      version: 6
       );
   }
 
@@ -32,7 +32,6 @@ class DatabaseManager {
         "id INTEGER PRIMARY KEY AUTOINCREMENT,"
         "content TEXT,"
         "isCompleted INTEGER,"
-        "isArchived INTEGER,"
         "color INTEGER,"
         "createdAt INTEGER,"
         "updatedAt INTEGER,"

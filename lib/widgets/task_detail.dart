@@ -21,19 +21,25 @@ class _TaskDetailState extends State<TaskDetail> {
   @override
   void initState() {
     _titleController = TextEditingController(text: widget.task.content);
-    notCompletedTasks = widget.task.subtasks.where((t) => !t.isCompleted).toList();
-    completedTasks = widget.task.subtasks.where((t) => t.isCompleted).toList();
     super.initState();
   }
 
-  Future<bool> onWillPop() {
+  Future<bool> onWillPop() async {
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    if (notCompletedTasks.isEmpty) {
+      widget.task.isCompleted = true;
+    } else if (completedTasks.length != widget.task.subtasks.length && widget.task.isCompleted) {
+      widget.task.isCompleted = false;
+    }
+    print("content: ${widget.task.content}");
+    await taskProvider.update(widget.task);
     Navigator.pop(context);
     return Future(() => true);
   }
 
   onPressedDelete() async {
     final taskProvider = Provider.of<TaskProvider>(context, listen: false);
-    await taskProvider.delete(widget.task.id!);
+    await taskProvider.delete(widget.task);
     Navigator.pop(context);
   }
 
@@ -59,76 +65,11 @@ class _TaskDetailState extends State<TaskDetail> {
     ]);
   }
 
-  Widget _notCompletedTasks(List<Task> subtasks) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            const Text(
-              "not completed",
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
-            const SizedBox(width: 25.0),
-            Text("${subtasks.length} / ${widget.task.subtasks.length}")
-          ],
-        ),
-        Expanded(
-          child: _notCompletedListView(subtasks),
-        )
-      ],
-    );
-  }
-
-  Widget _notCompletedListView(List<Task> subtasks) {
-    return ListView.builder(
-      itemCount: subtasks.length,
-      itemBuilder: (context, idx) {
-        return TaskTile(task: subtasks[idx], onChanged: () {
-          setState(() {
-            notCompletedTasks = widget.task.subtasks.where((t) => !t.isCompleted).toList();
-            completedTasks = widget.task.subtasks.where((t) => t.isCompleted).toList();
-          });
-        },);
-      },
-    );
-  }
-
-  Widget _completedTasks(List<Task> subtasks) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            const Text(
-              "completed",
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
-            const SizedBox(width: 25.0),
-            Text("${subtasks.length} / ${widget.task.subtasks.length}")
-          ],
-        ),
-        Expanded(
-          child: _completedListView(subtasks),
-        )
-      ],
-    );
-  }
-
-  Widget _completedListView(List<Task> subtasks) {
-    return ListView.builder(
-      itemCount: subtasks.length,
-      itemBuilder: (context, idx) {
-        return TaskTile(task: subtasks[idx], onChanged: () {
-          setState(() {
-            notCompletedTasks = widget.task.subtasks.where((t) => !t.isCompleted).toList();
-            completedTasks = widget.task.subtasks.where((t) => t.isCompleted).toList();
-          });
-        },);
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
+    notCompletedTasks = widget.task.subtasks.where((t) => !t.isCompleted).toList();
+    completedTasks = widget.task.subtasks.where((t) => t.isCompleted).toList();
     return WillPopScope(
       onWillPop: onWillPop,
       child: Scaffold(
@@ -148,14 +89,39 @@ class _TaskDetailState extends State<TaskDetail> {
               const SizedBox(
                 height: 35,
               ),
-              if (notCompletedTasks.isNotEmpty)
               Expanded(
-                child: _notCompletedTasks(notCompletedTasks),
+                child: ListView(
+                  children: [
+                    Theme(
+                      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                      child: ExpansionTile(
+                        initiallyExpanded: true,
+                        title: Row(
+                          children: [
+                            const Text("not completed tasks"),
+                            const SizedBox(width: 25.0),
+                            Text("${notCompletedTasks.length} / ${widget.task.subtasks.length}")
+                          ],
+                        ),
+                        children: notCompletedTasks.map((t) => TaskTile(task: t,),).toList(),
+                      ),
+                    ),
+                    Theme(
+                      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                      child: ExpansionTile(
+                        title: Row(
+                          children: [
+                            const Text("completed tasks"),
+                            const SizedBox(width: 25.0),
+                            Text("${completedTasks.length} / ${widget.task.subtasks.length}")
+                          ],
+                        ),
+                        children: completedTasks.map((t) => TaskTile(task: t,),).toList(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              if (completedTasks.isNotEmpty)
-              Expanded(
-                child: _completedTasks(completedTasks),
-              )
             ],
           ),
         ),

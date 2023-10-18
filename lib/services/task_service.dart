@@ -6,10 +6,10 @@ class TaskService {
 
   Future<List<Task>> fetchAll() => taskRepository.fetchAll();
 
-  Future<int> create(Task task) {
+  Future<Map> create(Task task) {
     task.subtasks.removeWhere((t) => t.content.trim().isEmpty);
-    final id = taskRepository.create(task);
-    return id;
+    final ids = taskRepository.create(task);
+    return ids;
   }
 
   Future<int> update(Task task) => taskRepository.update(task);

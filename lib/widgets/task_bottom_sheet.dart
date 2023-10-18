@@ -16,7 +16,17 @@ class _TaskBottomSheetState extends State<TaskBottomSheet> {
   final ScrollController _listController = ScrollController();
   late Task task;
   List<Task> subtasks = [];
+  List<FocusNode> focusNodes = [];
   bool _needsScroll = false;
+
+
+  @override
+  void dispose() {
+    for (var node in focusNodes) {
+      node.dispose();
+    }
+    super.dispose();
+  }
 
   addSubtask(Task task) {
     setState(() {
@@ -83,13 +93,15 @@ class _TaskBottomSheetState extends State<TaskBottomSheet> {
                     itemCount: subtasks.length + 1,
                     itemBuilder: (context, index) {
                       if (index < subtasks.length) {
-                        return SubTaskTile(task: subtasks[index]);
+                        return SubTaskTile(task: subtasks[index], focusNode: focusNodes[index]);
                       } else {
                         return ListTile(
                           leading: const Icon(Icons.add),
                             contentPadding: const EdgeInsets.symmetric(vertical: 0.0),
                             onTap: () {
+                              focusNodes.add(FocusNode());
                               addSubtask(Task(content: ""));
+                              focusNodes[index].requestFocus();
                             },
                             title: const Text("Add subtask"),
                         );

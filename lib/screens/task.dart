@@ -25,34 +25,11 @@ class _TaskScreenState extends State<TaskScreen> {
             ]);
           } else {
             return ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
               itemCount: taskProvider.tasks.length,
               itemBuilder: (BuildContext context, int index) {
                 final task = taskProvider.tasks[index];
-                return Dismissible(
-                  background: Container(
-                    color: Colors.red[200],
-                    child: const Center(
-                        child: Text(
-                      "DELETE",
-                      style: TextStyle(color: Colors.white),
-                    )),
-                  ),
-                  key: Key(task.id!.toString()),
-                  child: TaskTile(
-                    task: task,
-                    onChanged: () {
-                      if (task.subtasks.isNotEmpty) {
-                        for (int i = 0; i < task.subtasks.length; i++) {
-                          final subtask = task.subtasks[i];
-                          subtask.isCompleted = task.isCompleted;
-                        }
-                      }
-                    },
-                  ),
-                  onDismissed: (direction) {
-                    taskProvider.delete(task.id!);
-                  },
-                );
+                return TaskTile(task: task);
               },
             );
           }

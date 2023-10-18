@@ -4,8 +4,6 @@ class Task {
   int? id;
   String content;
   bool isCompleted;
-  bool isArchived;
-  bool isSelected;
   int color;
   int? parentId;
   DateTime createdAt;
@@ -17,8 +15,6 @@ class Task {
     this.id,
     required this.content,
     this.isCompleted = false,
-    this.isArchived = false,
-    this.isSelected = false,
     subtasks,
     this.parentId,
     int? color,
@@ -35,7 +31,6 @@ class Task {
       id: map["id"],
       content: map["content"],
       isCompleted: map["isCompleted"] == 1,
-      isArchived: map["isArchived"] == 1,
       color: map["color"],
       parentId: map["parentId"],
       createdAt: DateTime.fromMillisecondsSinceEpoch(map["createdAt"]).toLocal(),
@@ -48,7 +43,6 @@ class Task {
       "id": id,
       "content": content,
       "isCompleted": isCompleted,
-      "isArchived": isArchived,
       "color": color,
       "parentId": parentId,
       "subtasks": subtasks,
@@ -62,7 +56,6 @@ class Task {
       int? id,
       String? content, 
       bool? isCompleted,
-      bool? isArchived,
       int? color,
       int? parentId,
       List<Task>? subtasks,
@@ -74,7 +67,6 @@ class Task {
       id: id ?? this.id,
       content: content ?? this.content,
       isCompleted: isCompleted ?? this.isCompleted,
-      isArchived: isArchived ?? this.isArchived,
       color: color ?? this.color,
       parentId: parentId ?? this.parentId,
       subtasks: subtasks ?? this.subtasks,
@@ -87,7 +79,6 @@ class Task {
     return {
       "content": content,
       "isCompleted": isCompleted ? 1: 0,
-      "isArchived": isArchived ? 1: 0,
       "color": color,
       "parentId": parentId,
       "createdAt": createdAt.toUtc().millisecondsSinceEpoch,
@@ -97,6 +88,6 @@ class Task {
 
   @override
   String toString() {
-    return 'Note{id: $id, content: $content, isCompleted: $isCompleted, isArchived: $isArchived, isSelected: $isSelected, color: $color, parentId: $parentId, createdAt: $createdAt, updatedAt: $updatedAt}';
+    return 'Note{id: $id, content: $content, isCompleted: $isCompleted, color: $color, parentId: $parentId, createdAt: $createdAt, updatedAt: $updatedAt}';
   }
 }

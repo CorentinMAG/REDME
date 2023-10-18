@@ -17,19 +17,23 @@ void main() async {
   tz.setLocalLocation(tz.getLocation(currentTimeZone));
 
   runApp(
-    MultiProvider(providers: [
-      ChangeNotifierProvider(create: (_) => AppProvider()),
-      ChangeNotifierProxyProvider<AppProvider, NoteProvider>(
-          create: (BuildContext context) =>
-              NoteProvider(Provider.of<AppProvider>(context, listen: false)),
-          update: (BuildContext context, appProvider, noteProvider) =>
-              noteProvider!..updateState(appProvider)),
-      ChangeNotifierProxyProvider<AppProvider, TaskProvider>(
-          create: (BuildContext context) =>
-              TaskProvider(Provider.of<AppProvider>(context, listen: false)),
-          update: (BuildContext context, appProvider, taskProvider) =>
-              taskProvider!..updateState(appProvider))
-    ], child: const MyApp()),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AppProvider()),
+        ChangeNotifierProxyProvider<AppProvider, NoteProvider>(
+            create: (context) => NoteProvider(
+                  Provider.of<AppProvider>(context, listen: false),
+                ),
+            update: (context, appProvider, noteProvider) =>
+                noteProvider!..updateState(appProvider)),
+        ChangeNotifierProxyProvider<AppProvider, TaskProvider>(
+            create: (context) =>
+                TaskProvider(Provider.of<AppProvider>(context, listen: false)),
+            update: (context, appProvider, taskProvider) =>
+                taskProvider!..updateState(appProvider))
+      ],
+      child: const MyApp(),
+    ),
   );
 }
 
@@ -39,10 +43,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'REDME',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData.light(useMaterial3: true),
-        themeMode: ThemeMode.system,
-        home: const HomeScreen());
+      title: 'REDME',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.light(useMaterial3: true),
+      themeMode: ThemeMode.system,
+      home: const HomeScreen(),
+    );
   }
 }

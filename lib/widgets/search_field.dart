@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:redme/providers/app_provider.dart';
 import 'package:redme/providers/note_provider.dart';
+import 'package:redme/providers/task_provider.dart';
 
 class SearchField extends StatefulWidget {
-  const SearchField({super.key});
+  int index;
+  SearchField({super.key, required this.index});
 
   @override
   State<SearchField> createState() => _SearchFieldState();
@@ -28,18 +30,24 @@ class _SearchFieldState extends State<SearchField> {
   @override
   Widget build(BuildContext context) {
     final noteProvider = Provider.of<NoteProvider>(context, listen: false);
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
     return Consumer<AppProvider>(
         builder: (BuildContext context, appProvider, child) {
       return TextField(
         controller: _textController,
         onChanged: (text) {
-          if (text == "") {
-            appProvider.isEditing = false;
-          } else if (!appProvider.isEditing) {
-            appProvider.isEditing = true;
-          }
-          noteProvider.filter(text);
-          noteProvider.sortByLastUpdated();
+            if (text == "") {
+              appProvider.isEditing = false;
+            } else if (!appProvider.isEditing) {
+              appProvider.isEditing = true;
+            }
+
+            if (widget.index == 0) {
+            noteProvider.filter(text);
+            noteProvider.sortByLastUpdated();
+            } else if (widget.index == 1) {
+              taskProvider.filter(text);
+            }
         },
         style: const TextStyle(fontSize: 16, color: Colors.black87),
         decoration: InputDecoration(

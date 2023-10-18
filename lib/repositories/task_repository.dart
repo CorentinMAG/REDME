@@ -5,17 +5,19 @@ import 'package:redme/exceptions/task.dart';
 
 class TaskRepository {
 
-  Future<int> create(Task task) async {
+  Future<Map> create(Task task) async {
     if (task.id != null) throw TaskException("Task has an id");
 
     Database db = await DatabaseManager.initializeDB();
     final id = await db.insert('task', task.toMap3(), conflictAlgorithm: ConflictAlgorithm.replace);
 
+    List<int> subtaskIds = [];
     for (final subtask in task.subtasks) {
       subtask.parentId = id;
-      final subtask_id = await db.insert("task", subtask.toMap3(), conflictAlgorithm: ConflictAlgorithm.replace);
+      final subtaskId = await db.insert("task", subtask.toMap3(), conflictAlgorithm: ConflictAlgorithm.replace);
+      subtaskIds.add(subtaskId);
     }
-    return id;
+    return {"id": id, "subtaskIds": subtaskIds};
   }
 
   Future<int> update(Task task) async {
@@ -23,6 +25,10 @@ class TaskRepository {
 
     Database db = await DatabaseManager.initializeDB();
     var result = db.update("task", task.toMap3(), where: "id=?", whereArgs: [task.id]);
+
+    for (final subtask in task.subtasks) {
+      final subtask_id = await db.update("task", subtask.toMap3(), where: "id=?", whereArgs: [subtask.id]);
+    }
     return result;
   }
 

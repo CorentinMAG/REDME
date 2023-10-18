@@ -59,25 +59,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     Tab(text: "Settings", icon: Icon(Icons.settings))
                   ],
                 ),
-                const Padding(
-                  padding: EdgeInsets.all(20),
-                  child: SearchField()
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: SearchField(index: tabIndex)
                 ),
                 Expanded(
                   child: TabBarView(
                     controller: _tabController,
-                    children: const [
+                    children: [
                       Padding(
-                        padding: EdgeInsets.only(left: 15.0, right: 15.0),
-                        child: Indicator(child: NoteScreen())
+                        padding: const EdgeInsets.only(left: 15.0, right: 15.0),
+                        child: Indicator(child: NoteScreen(), index: tabIndex)
                       ),
                       Padding(
-                        padding: EdgeInsets.only(left: 15.0, right: 15.0),
-                        child: Indicator(child: TaskScreen())
+                        padding: const EdgeInsets.only(left: 15.0, right: 15.0),
+                        child: Indicator(child: TaskScreen(), index: tabIndex)
                       ),
-                      Padding(
+                      const Padding(
                         padding: EdgeInsets.only(left: 15.0, right: 15.0),
-                        child: Indicator(child: Text("Settings"))
+                        child: Text("Settings")
                       ),
                     ]
                   )
